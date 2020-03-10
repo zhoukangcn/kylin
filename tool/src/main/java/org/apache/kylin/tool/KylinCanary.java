@@ -21,6 +21,7 @@ package org.apache.kylin.tool;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.configuration.SubsetConfiguration;
+import org.apache.hadoop.metrics2.AbstractMetric;
 import org.apache.hadoop.metrics2.MetricsRecord;
 import org.apache.hadoop.metrics2.MetricsSink;
 import org.apache.hadoop.metrics2.MetricsSystem;
@@ -121,11 +122,10 @@ public class KylinCanary extends AbstractApplication {
 
         String[] servers = config.getRestServers();
 
-        // skip job server
         // should use zookeeper info instead
         int total = 0;
         int failed = 0;
-        for (int i = 1; i < servers.length; i++) {
+        for (int i = 0; i < servers.length; i++) {
             total++;
             try {
                 checkQuery(servers[i]);
@@ -200,7 +200,10 @@ public class KylinCanary extends AbstractApplication {
 
         @Override
         public void putMetrics(MetricsRecord record) {
-            logger.info("metrics: " + record);
+            // LOG.info("Metric: " + metricsRecord);
+            for (AbstractMetric metric : record.metrics()) {
+                logger.info("metric: " + metric.name() + " : " + metric.value());
+            }
         }
 
         @Override
